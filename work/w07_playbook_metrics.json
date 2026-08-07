@@ -1,0 +1,15 @@
+{
+  "model": "RandomForestClassifier",
+  "split_method": "client_grouped",
+  "train_clients": 21,
+  "test_clients": 10,
+  "precision_at_50": 0.66,
+  "baseline_precision_at_50": 0.48,
+  "action_label_counts": {
+    "monitor": 2295,
+    "refresh_priority": 1531,
+    "no_action": 334
+  },
+  "avg_position_zero_pct_in_test": 0.0231,
+  "refresh_priority_flagged_with_avg_position_zero": 0
+}
