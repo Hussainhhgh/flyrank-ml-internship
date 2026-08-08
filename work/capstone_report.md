@@ -85,6 +85,8 @@ This rule is simple, fully auditable, and represents the kind of manual triage a
 | Random Forest — naive split *(inflated, shown for contrast)* | 0.88 |
 | **Random Forest — client-grouped (honest)** | **0.66** |
 
+![Model vs Baseline Precision@50](figures/model_vs_baseline.png)
+
 **Where the model and the rule disagree:** the two methods shared *zero* pages in their respective top-50 lists. Investigating a sample of pages the model flagged that the rule missed showed a consistent pattern — mid-range content age (138–148 days) sitting right at or just past the rule's tier boundary, combined with near-zero CTR. The rule's binary buckets were discarding real information: a page one day past a boundary was being treated identically to a page one day before it, while the model could weigh the continuous value directly.
 
 ---
