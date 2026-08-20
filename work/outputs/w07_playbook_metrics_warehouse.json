@@ -1,0 +1,20 @@
+{
+  "model": "RandomForestClassifier",
+  "data_source": "FlyRank warehouse, month=2026-03",
+  "split_method": "client_grouped",
+  "roc_auc": 0.921,
+  "train_clients": 30,
+  "test_clients": 14,
+  "reliability_guard_threshold_impressions": 30,
+  "action_label_counts": {
+    "no_action": 25055,
+    "monitor": 12186,
+    "refresh_priority": 4062,
+    "low_confidence_flag": 275
+  },
+  "low_confidence_flag_count": 275,
+  "top_permutation_features": {
+    "ctr_15d": 0.1516,
+    "log_clicks_15d": 0.0289
+  }
+}
