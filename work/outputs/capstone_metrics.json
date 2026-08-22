@@ -1,0 +1,21 @@
+{
+  "feature_month": "2026-03",
+  "n_train": 110403,
+  "n_test": 41578,
+  "n_train_clients": 30,
+  "n_test_clients": 14,
+  "test_base_rate": 0.2258,
+  "baseline_auc": 0.439,
+  "logreg_auc": 0.8835,
+  "rf_auc": 0.9203,
+  "rf_tuned_threshold": 0.6591,
+  "top_permutation_feature": "ctr_15d",
+  "top_permutation_share": 0.554,
+  "reliability_guard_threshold": 30,
+  "action_label_counts": {
+    "no_action": 25050,
+    "monitor": 12189,
+    "refresh_priority": 4064,
+    "low_confidence_flag": 275
+  }
+}
