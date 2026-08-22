@@ -140,12 +140,12 @@
   </div>
 
   <figure>
-    <img src="img/capstone_model_vs_baseline.png" alt="Bar chart comparing ROC AUC across the baseline rule, logistic regression, and random forest" class="fig">
+    <img src="work/capstone/img/capstone_model_vs_baseline.png" alt="Bar chart comparing ROC AUC across the baseline rule, logistic regression, and random forest" class="fig">
     <figcaption>Figure 1. The baseline rule scores below the chance line of 0.5. Random Forest shows a large and consistent lift over both the baseline and the linear model.</figcaption>
   </figure>
 
   <figure>
-    <img src="img/capstone_precision_recall.png" alt="Precision recall curve for the random forest model plotted against the base rate" class="fig">
+    <img src="work/capstone/img/capstone_precision_recall.png" alt="Precision recall curve for the random forest model plotted against the base rate" class="fig">
     <figcaption>Figure 2. Precision stays well above the 18.7 percent base rate across most of the recall range, meaning the model is genuinely finding signal rather than just flagging almost everything.</figcaption>
   </figure>
 
@@ -171,7 +171,7 @@
   <h2>Turning a risk score into something a person can actually act on</h2>
 
   <figure>
-    <img src="img/capstone_feature_importance.png" alt="Bar chart of permutation feature importance for the random forest model" class="fig">
+    <img src="work/capstone/img/capstone_feature_importance.png" alt="Bar chart of permutation feature importance for the random forest model" class="fig">
     <figcaption>Figure 3. Click-through rate and click momentum together account for 55.4 percent of everything the model bases its decisions on.</figcaption>
   </figure>
 
@@ -180,12 +180,12 @@
   <p>To fix this properly rather than just noting it as a caveat, I added a reliability guard directly into the scoring pipeline. Any page with fewer than thirty impressions in the fifteen day feature window is now routed into its own dedicated review tier, low confidence flag, instead of being allowed to compete for a spot in the high-priority refresh queue.</p>
 
   <figure>
-    <img src="img/capstone_score_distribution.png" alt="Histogram comparing risk score distribution for reliable evidence pages against low sample pages" class="fig">
+    <img src="work/capstone/img/capstone_score_distribution.png" alt="Histogram comparing risk score distribution for reliable evidence pages against low sample pages" class="fig">
     <figcaption>Figure 4. The very highest risk scores cluster heavily among low-sample pages, exactly the pattern the reliability guard was built to intercept before it reaches a reviewer.</figcaption>
   </figure>
 
   <figure>
-    <img src="img/capstone_action_distribution.png" alt="Bar chart showing the four action tiers and how many pages fall into each" class="fig">
+    <img src="work/capstone/img/capstone_action_distribution.png" alt="Bar chart showing the four action tiers and how many pages fall into each" class="fig">
     <figcaption>Figure 5. The final four-tier queue on this test run: 25,050 pages need no action, 12,189 should be monitored, 4,064 are true refresh priorities, and 275 were caught by the reliability guard.</figcaption>
   </figure>
 
