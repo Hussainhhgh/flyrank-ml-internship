@@ -76,10 +76,10 @@
       <tr><td><strong>Random Forest</strong></td><td><strong>0.920</strong></td><td>0.568</td><td>0.9999</td><td>0.725</td></tr>
     </tbody>
   </table>
-  <img src="img/capstone_model_vs_baseline.png" alt="Bar chart comparing ROC AUC across baseline rule, logistic regression, and random forest" class="fig">
+  <img src="work/capstone/img/capstone_model_vs_baseline.png" alt="Bar chart comparing ROC AUC across baseline rule, logistic regression, and random forest" class="fig">
   <p class="caption">Fig. 1 — The baseline rule performs below chance. Random Forest shows a large, consistent lift.</p>
 
-  <img src="img/capstone_precision_recall.png" alt="Precision-recall curve for the Random Forest model against the base rate" class="fig">
+  <img src="work/capstone/img/capstone_precision_recall.png" alt="Precision-recall curve for the Random Forest model against the base rate" class="fig">
   <p class="caption">Fig. 2 — Precision stays well above the 18.7% base rate across most of the recall range.</p>
 
   <p><strong>An honest threshold finding:</strong> tuning the classification threshold (Youden's J statistic, 0.659 vs. the default 0.5) barely moved recall — 0.9999 → 0.9996. This means the model's predicted probabilities are heavily concentrated near 1.0 for the positive class, not miscalibrated at a single threshold. ROC AUC, which doesn't depend on a threshold, is the more trustworthy comparison metric here.</p>
@@ -98,15 +98,15 @@
 
 <section id="recommendations">
   <h2>6. Ranked recommendations</h2>
-  <img src="img/capstone_feature_importance.png" alt="Bar chart of permutation feature importance" class="fig">
+  <img src="work/capstone/img/capstone_feature_importance.png" alt="Bar chart of permutation feature importance" class="fig">
   <p class="caption">Fig. 3 — CTR and click momentum together account for 55.4% of the model's decisions.</p>
 
   <p><strong>The finding that reshaped the whole playbook:</strong> auditing the model's own top 10 highest-risk predictions revealed every single one was a page with 1 impression and 1 click — a mathematically "perfect" 100% CTR that carries zero real signal. I built a reliability guard: pages below 30 fifteen-day impressions are routed to their own <code>low_confidence_flag</code> tier instead of contaminating <code>refresh_priority</code>.</p>
 
-  <img src="img/capstone_score_distribution.png" alt="Histogram showing risk score distribution split by reliable vs low-sample evidence" class="fig">
+  <img src="work/capstone/img/capstone_score_distribution.png" alt="Histogram showing risk score distribution split by reliable vs low-sample evidence" class="fig">
   <p class="caption">Fig. 4 — The highest risk scores cluster heavily among low-sample pages — exactly what the reliability guard was built to catch.</p>
 
-  <img src="img/capstone_action_distribution.png" alt="Bar chart of the four action tiers and page counts" class="fig">
+  <img src="work/capstone/img/capstone_action_distribution.png" alt="Bar chart of the four action tiers and page counts" class="fig">
   <p class="caption">Fig. 5 — The resulting four-tier queue: 25,050 no_action, 12,189 monitor, 4,064 refresh_priority, 275 low_confidence_flag.</p>
 
   <p><strong>Human review is mandatory for every <code>refresh_priority</code> flag.</strong> A reviewer should check whether elevated CTR or click momentum reflects a sustainable pattern versus a short-lived spike, and whether the page is tied to time-limited campaign content.</p>
