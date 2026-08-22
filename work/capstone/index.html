@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Decline Prediction — A FlyRank Search Intelligence Capstone</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="hero">
+  <p class="eyebrow">FlyRank ML Internship · Capstone Paper</p>
+  <h1>Which pages are about to decline — before they do?</h1>
+  <p class="subtitle">A reliability-guarded model for flagging content decline risk in real search performance data, built on FlyRank's production warehouse.</p>
+  <div class="meta">
+    <span><strong>Author:</strong> Hussain</span>
+    <span><strong>Lane:</strong> Refresh / Content Opportunity Scoring</span>
+    <span><strong>Repo:</strong> <a href="https://github.com/Hussainhhgh/flyrank-ml-internship">GitHub →</a></span>
+  </div>
+</header>
+
+<nav class="toc">
+  <a href="#abstract">Abstract</a>
+  <a href="#problem">1. Problem</a>
+  <a href="#data">2. Data</a>
+  <a href="#methodology">3. Methodology</a>
+  <a href="#results">4. Results</a>
+  <a href="#limitations">5. Limitations</a>
+  <a href="#recommendations">6. Recommendations</a>
+  <a href="#reproducibility">7. Reproducibility</a>
+  <a href="#acknowledgments">8. Acknowledgments</a>
+</nav>
+
+<main>
+
+<section id="abstract">
+  <h2>Abstract</h2>
+  <p>Content that ranks well quietly decays — and most teams only notice after the traffic is gone. Using six weeks of real FlyRank warehouse data (March 2026, 151,981 pages across 44 clients), I built a Random Forest classifier to predict which pages will see a meaningful click drop, using only signals visible in the first half of the month. Validated on a client-grouped holdout split, the model reached a ROC AUC of <strong>0.920</strong>, against <strong>0.439</strong> for a hand-written baseline rule — worse than chance. While auditing the model's highest-confidence flags, I found every one of its top 10 predictions was driven by a single-click, single-impression page reporting a statistically meaningless "100% CTR." I built a reliability guard to catch exactly this pattern before it reaches a reviewer. The result is a ranked, reason-coded action queue — decision-support for a content team, not an autonomous system.</p>
+</section>
+
+<section id="problem">
+  <h2>1. Problem framing</h2>
+  <p><strong>The decision this supports:</strong> which pages should a content or SEO team prioritize for review, given limited capacity to manually check thousands of pages a month.</p>
+  <p><strong>Unit of analysis:</strong> one page, aggregated over a 15-day feature window.</p>
+  <p><strong>Output:</strong> a decline-risk score, a reason code, and an action label — <code>refresh_priority</code>, <code>monitor</code>, <code>low_confidence_flag</code>, or <code>no_action</code>.</p>
+  <p><strong>Cost of a wrong call:</strong> a missed decline compounds silently until it's expensive to reverse. A false flag wastes a scarce review slot. A subtler cost, discovered directly while building this — flagging a page on statistically meaningless evidence erodes trust in the whole system, which is why thin-evidence pages get their own tier rather than a forced confident call.</p>
+  <p><strong>Why this needed a model, not just a rule:</strong> a hand-written rule combining position and CTR reached a ROC AUC of 0.439 — worse than random guessing. An earlier signal audit had already found that decline risk peaks in the <em>middle</em> of the ranking pack, not at the extremes — the opposite of the naive assumption a simple rule would encode.</p>
+</section>
+
+<section id="data">
+  <h2>2. Data</h2>
+  <p><strong>Source:</strong> FlyRank ML Internship warehouse, <code>fact_content_daily_performance</code> table, queried directly via DuckDB over Hugging Face (<code>hf://</code>) — no local download.</p>
+  <p><strong>Partition:</strong> <code>month=2026-03</code>, 151,981 pages across 44 clients, filtered to <code>gsc_data_available = TRUE</code> and non-zero impressions.</p>
+  <p><strong>Feature window:</strong> <code>report_date &lt;= 2026-03-15</code>. <strong>Label window:</strong> <code>report_date &gt;= 2026-03-16</code>. No overlap.</p>
+  <p><strong>Label:</strong> a page is <code>declining = 1</code> if its second-half clicks fall below 90% of its first-half clicks. Base rate: <strong>18.7%</strong>.</p>
+  <p><strong>Excluded:</strong> the future click count used to build the label is never used as a feature — confirmed by a deliberate leak test: including it inflates AUC from 0.921 to 0.998.</p>
+  <p><strong>Public safety:</strong> no client names, domains, URLs, or private queries appear anywhere in this repository. Every identifier is a pseudonymous hash.</p>
+</section>
+
+<section id="methodology">
+  <h2>3. Methodology</h2>
+  <p><strong>Baseline rule:</strong> flags a page if it holds a top-3 or page-1 position AND its CTR underperforms its position band's training-calibrated expected CTR by more than 30%.</p>
+  <p><strong>Features:</strong> log-scaled impressions and clicks, average position, and CTR — all computed strictly within the feature window.</p>
+  <p><strong>Models compared:</strong> Logistic Regression and Random Forest (200 trees, max depth 6, class-balanced).</p>
+  <p><strong>Split:</strong> <code>GroupShuffleSplit</code> by client — 30 training clients, 14 test clients, zero overlap. A row-level split would let the same client's pages leak across train and test.</p>
+  <p><strong>Leakage checks:</strong> every feature confirmed computed before the label window; correlation audit showed no feature suspiciously close to a disguised label copy (max correlation: 0.18, far below the leakage threshold of ~0.85).</p>
+</section>
+
+<section id="results">
+  <h2>4. Results (vs baseline)</h2>
+  <table>
+    <thead><tr><th>Method</th><th>ROC AUC</th><th>Precision</th><th>Recall</th><th>F1</th></tr></thead>
+    <tbody>
+      <tr><td>Baseline rule</td><td>0.439</td><td>0.185</td><td>0.431</td><td>0.259</td></tr>
+      <tr><td>Logistic Regression</td><td>0.884</td><td>0.555</td><td>0.850</td><td>0.671</td></tr>
+      <tr><td><strong>Random Forest</strong></td><td><strong>0.920</strong></td><td>0.568</td><td>0.9999</td><td>0.725</td></tr>
+    </tbody>
+  </table>
+  <img src="img/capstone_model_vs_baseline.png" alt="Bar chart comparing ROC AUC across baseline rule, logistic regression, and random forest" class="fig">
+  <p class="caption">Fig. 1 — The baseline rule performs below chance. Random Forest shows a large, consistent lift.</p>
+
+  <img src="img/capstone_precision_recall.png" alt="Precision-recall curve for the Random Forest model against the base rate" class="fig">
+  <p class="caption">Fig. 2 — Precision stays well above the 18.7% base rate across most of the recall range.</p>
+
+  <p><strong>An honest threshold finding:</strong> tuning the classification threshold (Youden's J statistic, 0.659 vs. the default 0.5) barely moved recall — 0.9999 → 0.9996. This means the model's predicted probabilities are heavily concentrated near 1.0 for the positive class, not miscalibrated at a single threshold. ROC AUC, which doesn't depend on a threshold, is the more trustworthy comparison metric here.</p>
+</section>
+
+<section id="limitations">
+  <h2>5. Limitations</h2>
+  <ul>
+    <li>Single-month validation (March 2026 only) — not tested across seasons.</li>
+    <li>Trained on 30 of 44 clients — generalization to unseen client types is unverified.</li>
+    <li><code>avg_position = 0</code> means "no data," not literal rank zero (0.7% of the test set).</li>
+    <li>The label is a proxy for "declining," not a validated business definition of decay.</li>
+    <li>This is observational, decision-support evidence — not a causal claim, and not a claim about how any search engine ranks pages.</li>
+  </ul>
+</section>
+
+<section id="recommendations">
+  <h2>6. Ranked recommendations</h2>
+  <img src="img/capstone_feature_importance.png" alt="Bar chart of permutation feature importance" class="fig">
+  <p class="caption">Fig. 3 — CTR and click momentum together account for 55.4% of the model's decisions.</p>
+
+  <p><strong>The finding that reshaped the whole playbook:</strong> auditing the model's own top 10 highest-risk predictions revealed every single one was a page with 1 impression and 1 click — a mathematically "perfect" 100% CTR that carries zero real signal. I built a reliability guard: pages below 30 fifteen-day impressions are routed to their own <code>low_confidence_flag</code> tier instead of contaminating <code>refresh_priority</code>.</p>
+
+  <img src="img/capstone_score_distribution.png" alt="Histogram showing risk score distribution split by reliable vs low-sample evidence" class="fig">
+  <p class="caption">Fig. 4 — The highest risk scores cluster heavily among low-sample pages — exactly what the reliability guard was built to catch.</p>
+
+  <img src="img/capstone_action_distribution.png" alt="Bar chart of the four action tiers and page counts" class="fig">
+  <p class="caption">Fig. 5 — The resulting four-tier queue: 25,050 no_action, 12,189 monitor, 4,064 refresh_priority, 275 low_confidence_flag.</p>
+
+  <p><strong>Human review is mandatory for every <code>refresh_priority</code> flag.</strong> A reviewer should check whether elevated CTR or click momentum reflects a sustainable pattern versus a short-lived spike, and whether the page is tied to time-limited campaign content.</p>
+  <p><strong>What must never be automated:</strong> auto-publishing content changes, auto-deprioritizing pages, or treating the risk score as a calibrated real-world probability rather than a ranking signal.</p>
+</section>
+
+<section id="reproducibility">
+  <h2>7. Reproducibility</h2>
+  <pre><code>git clone https://github.com/Hussainhhgh/flyrank-ml-internship.git
+cd flyrank-ml-internship
+pip install -r requirements.txt
+# Set HF_TOKEN in Colab Secrets before running
+jupyter notebook work/notebooks/capstone.ipynb</code></pre>
+  <p>Random seed: <code>42</code>, fixed throughout every split and model. All notebooks referenced in this paper are committed under <code>work/notebooks/</code> in the linked repository, including the earlier weekly notebooks this capstone builds on.</p>
+</section>
+
+<section id="acknowledgments">
+  <h2>8. Acknowledgments &amp; data credit</h2>
+  <p>Built on the <a href="https://flyrank.ai">FlyRank ML Internship dataset</a>.</p>
+</section>
+
+</main>
+
+<footer>
+  <p>Content Decline Prediction — a Search Intelligence capstone paper.</p>
+</footer>
+
+</body>
+</html>
