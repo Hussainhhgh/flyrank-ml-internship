@@ -1,145 +1,251 @@
+/* =========================================
+   FLYRANK CAPSTONE - RESEARCH PAPER THEME
+   ========================================= */
+
 :root {
-  --ink: #1a1a1a;
-  --muted: #5a6270;
-  --accent: #2c7a4f;
-  --bg: #fafaf8;
-  --card: #ffffff;
-  --border: #e5e5e0;
+  /* Color Palette */
+  --bg-color: #ffffff;
+  --surface-color: #f8fafc; /* Very light slate for contrast blocks */
+  --text-main: #0f172a;     /* Deep slate for better reading than pure black */
+  --text-muted: #475569;
+  --accent: #2563eb;        /* Professional tech blue */
+  --accent-light: #eff6ff;
+  --border-color: #e2e8f0;
+  
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: "Georgia", "Times New Roman", serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 }
 
-* { box-sizing: border-box; }
+html {
+  scroll-behavior: smooth; /* Smooth scrolling for TOC links */
+}
+
+* { 
+  box-sizing: border-box; 
+}
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  color: var(--ink);
-  background: var(--bg);
+  font-family: var(--font-sans);
+  color: var(--text-main);
+  background: var(--bg-color);
   margin: 0;
-  line-height: 1.6;
+  line-height: 1.7;
+  font-size: 1.1rem;
+  -webkit-font-smoothing: antialiased;
 }
 
+/* --- HERO / TITLE SECTION --- */
 .hero {
-  padding: 4rem 2rem 3rem;
-  max-width: 780px;
+  padding: 6rem 2rem 4rem;
+  max-width: 850px;
   margin: 0 auto;
+  text-align: center;
 }
 
 .eyebrow {
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  font-size: 0.85rem;
   color: var(--accent);
-  font-weight: 600;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
 }
 
 h1 {
-  font-size: 2.4rem;
-  line-height: 1.2;
-  margin: 0.5rem 0 1rem;
+  font-family: var(--font-serif);
+  font-size: 3rem;
+  line-height: 1.15;
+  margin: 0 0 1.5rem;
+  color: #000000;
+  letter-spacing: -0.02em;
 }
 
 .subtitle {
-  font-size: 1.15rem;
-  color: var(--muted);
+  font-size: 1.3rem;
+  color: var(--text-muted);
+  max-width: 700px;
+  margin: 0 auto 2rem;
+  line-height: 1.5;
 }
 
 .meta {
   display: flex;
-  gap: 1.5rem;
+  justify-content: center;
+  gap: 2rem;
   flex-wrap: wrap;
-  margin-top: 1.5rem;
-  font-size: 0.9rem;
-  color: var(--muted);
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.95rem;
+  color: var(--text-muted);
 }
 
-.meta a { color: var(--accent); }
+.meta a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
 
+.meta a:hover {
+  text-decoration: underline;
+}
+
+/* --- TABLE OF CONTENTS --- */
 .toc {
-  max-width: 780px;
-  margin: 0 auto 2rem;
-  padding: 1rem 2rem;
+  max-width: 850px;
+  margin: 0 auto 3rem;
+  padding: 1.5rem 2rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  justify-content: center;
+  gap: 0.75rem;
+  background: var(--surface-color);
+  border-radius: 12px;
 }
 
 .toc a {
-  color: var(--muted);
+  color: var(--text-muted);
   text-decoration: none;
   font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
 }
 
-.toc a:hover { color: var(--accent); }
+.toc a:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
 
+/* --- MAIN CONTENT --- */
 main {
-  max-width: 780px;
+  max-width: 750px; /* Slightly narrower than header for optimal reading length */
   margin: 0 auto;
   padding: 0 2rem 4rem;
 }
 
 section {
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
+  scroll-margin-top: 2rem; /* Prevents TOC links from scrolling the header under the top of the browser */
 }
 
 h2 {
-  font-size: 1.5rem;
-  border-bottom: 2px solid var(--accent);
-  padding-bottom: 0.5rem;
-  margin-bottom: 1.2rem;
+  font-family: var(--font-sans);
+  font-size: 1.75rem;
+  color: #000000;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.01em;
 }
 
+/* Make the Abstract stand out like an executive summary */
+#abstract {
+  background: var(--surface-color);
+  padding: 2rem;
+  border-left: 4px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  font-size: 1.05rem;
+}
+
+#abstract h2 {
+  margin-top: 0;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+/* --- DATA TABLES (Academic Style) --- */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin: 1.5rem 0;
+  margin: 2.5rem 0;
+  font-size: 1rem;
 }
 
 th, td {
-  padding: 0.6rem 0.8rem;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-}
-
-th { background: #f0f0ec; font-weight: 600; }
-
-code {
-  background: #f0f0ec;
-  padding: 0.15rem 0.4rem;
-  border-radius: 4px;
-  font-size: 0.9em;
-}
-
-pre {
-  background: #1a1a1a;
-  color: #e5e5e0;
   padding: 1rem;
-  border-radius: 8px;
-  overflow-x: auto;
+  text-align: left;
 }
 
-pre code { background: none; color: inherit; }
+th {
+  font-weight: 600;
+  color: #000000;
+  border-bottom: 2px solid #000000; /* Strong academic top border */
+}
 
+td {
+  border-bottom: 1px solid var(--border-color);
+}
+
+tbody tr:hover {
+  background-color: var(--surface-color);
+}
+
+/* --- IMAGES & FIGURES --- */
 .fig {
   width: 100%;
-  max-width: 640px;
+  height: auto;
   display: block;
-  margin: 1.5rem auto 0.5rem;
-  border: 1px solid var(--border);
+  margin: 3rem auto 1rem;
   border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--border-color);
 }
 
 .caption {
   text-align: center;
-  font-size: 0.85rem;
-  color: var(--muted);
-  margin-bottom: 2rem;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-bottom: 3rem;
+  font-style: italic;
 }
 
+/* --- CODE BLOCKS --- */
+code {
+  font-family: var(--font-mono);
+  background: var(--surface-color);
+  color: #be185d; /* Subtle pink/red for inline code */
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+pre {
+  background: #0f172a; /* Deep dark background for code blocks */
+  padding: 1.5rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 2rem 0;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+pre code {
+  background: none;
+  color: #e2e8f0;
+  padding: 0;
+  font-size: 0.9em;
+}
+
+/* --- FOOTER --- */
 footer {
   text-align: center;
-  padding: 2rem;
-  color: var(--muted);
-  font-size: 0.85rem;
-  border-top: 1px solid var(--border);
+  padding: 3rem 2rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--surface-color);
+}
+
+/* --- RESPONSIVE ADJUSTMENTS --- */
+@media (max-width: 768px) {
+  h1 { font-size: 2.2rem; }
+  .hero { padding: 4rem 1.5rem 2rem; }
+  main { padding: 0 1.5rem 3rem; }
+  .meta { flex-direction: column; align-items: center; gap: 0.5rem; }
 }
